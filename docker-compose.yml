@@ -19,7 +19,7 @@ services:
       - nextcloud-bridge
   
   nextcloud-back:
-    image: 19995/nextcloud_test:2.0.0
+    image: 19995/nextcloud_back:1.0.0
     container_name: nextcloud-back
     restart: unless-stopped
     environment:
