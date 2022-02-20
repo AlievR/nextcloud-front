@@ -1,0 +1,52 @@
+version: '3.1'
+
+volumes:
+  backend_uploads: {}
+  mongo_data: {}
+
+services:
+  mongo:
+    image: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - nextcloud-bridge
+  
+  nextcloud-back:
+    image: 19995/nextcloud_test:2.0.0
+    container_name: nextcloud-back
+    restart: unless-stopped
+    environment:
+      MONGO_URI: "mongodb://root:example@192.168.0.103:27017"
+      PORT_LISTEN: "5000"
+      SECRET_KEY: "OsePCiT MinDigital"
+    ports:
+      - 5000:5000
+    volumes:
+      - backend_uploads:/usr/src/app/uploads
+    networks:
+      - nextcloud-bridge
+    depends_on:
+      - mongo
+
+  nextcloud_front:
+    container_name: nextcloud_front
+    image: 19995/nextcloud_front:1.0.0
+    ports:
+      - 80:80
+    restart: unless-stopped
+    networks: 
+      - nextcloud-bridge 
+
+networks: 
+  nextcloud-bridge: 
+    driver: bridge 
+    ipam: 
+     config: 
+       - subnet: 172.31.87.0/26
